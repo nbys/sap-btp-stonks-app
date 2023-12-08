@@ -2,15 +2,15 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<artifactId>bookshop-parent</artifactId>
+		<artifactId>stonks-parent</artifactId>
 		<groupId>customer</groupId>
 		<version>${revision}</version>
 	</parent>
 
-	<artifactId>bookshop</artifactId>
+	<artifactId>stonks</artifactId>
 	<packaging>jar</packaging>
 
-	<name>bookshop</name>
+	<name>stonks</name>
 
 	<!-- ACTUAL DEPENDENCIES -->
 	<dependencies>

@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>customer</groupId>
-	<artifactId>bookshop-parent</artifactId>
+	<artifactId>stonks-parent</artifactId>
 	<version>${revision}</version>
 	<packaging>pom</packaging>
 
-	<name>bookshop parent</name>
+	<name>stonks parent</name>
 
 	<properties>
 		<!-- OUR VERSION -->
