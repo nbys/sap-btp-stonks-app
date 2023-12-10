@@ -4,6 +4,7 @@
 *.sqlite
 schema*.sql
 default-env.json
+.vscode
 
 **/bin/
 **/target/

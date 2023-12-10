@@ -15,5 +15,3 @@
 - [ ] Create a new project
 - [ ] How to connect to HANA
 - [ ] Implement basic data pipeline
-
-test
