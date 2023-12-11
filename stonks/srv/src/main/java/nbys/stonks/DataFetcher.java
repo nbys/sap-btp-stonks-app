@@ -17,8 +17,8 @@ public class DataFetcher {
 
     private final WebClient webClient = WebClient.create();
 
-    // @Value("${stonks.data.api.url}")
-    private String URL = "localhost:8000";
+    @Value("${stonks.data.api.url}")
+    private String URL;
 
     public String unmarshalJSON() throws JsonProcessingException {
         String json = "{\n" +
@@ -79,7 +79,7 @@ public class DataFetcher {
     public void startFetchingData() {
         while (true) {
             try {
-                Thread.sleep(10000);
+                Thread.sleep(800000);
                 logger.info("Fetching data...");
             } catch (InterruptedException e) {
                 e.printStackTrace();
