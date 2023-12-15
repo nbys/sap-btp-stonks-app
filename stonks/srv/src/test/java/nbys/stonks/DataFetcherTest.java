@@ -8,9 +8,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
+import nbys.stonks.cds.TickerHandler;
+
 @SpringBootTest
 @EnableAutoConfiguration
-@ContextConfiguration(classes = DataFetcher.class)
+@ContextConfiguration(classes = { DataFetcher.class, TickerHandler.class })
 @ActiveProfiles("test")
 public class DataFetcherTest {
     @Test

@@ -1,15 +1,13 @@
-package nbys.stonks.eventhandlers;
+package nbys.stonks.cds;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.sap.cds.Result;
 import com.sap.cds.services.cds.CdsReadEventContext;
 import com.sap.cds.services.cds.CqnService;
 import com.sap.cds.services.handler.EventHandler;
-import com.sap.cds.services.handler.annotations.After;
-import com.sap.cds.services.handler.annotations.Before;
 import com.sap.cds.services.handler.annotations.On;
 import com.sap.cds.services.handler.annotations.ServiceName;
 import com.sap.cds.services.persistence.PersistenceService;
@@ -21,11 +19,15 @@ import cds.gen.myservice.Ticker_;
 
 @Component
 @ServiceName(MyService_.CDS_NAME)
-public class TickerEventHandler implements EventHandler {
-    static final Logger logger = LoggerFactory.getLogger(TickerEventHandler.class);
+public class TickerHandler implements EventHandler {
+    static final Logger logger = LoggerFactory.getLogger(TickerHandler.class);
 
     @Autowired
     private PersistenceService db;
+
+    public TickerHandler(PersistenceService db) {
+        this.db = db;
+    }
 
     @On(event = CqnService.EVENT_READ, entity = Ticker_.CDS_NAME)
     public Result onReadTicker(
@@ -42,4 +44,9 @@ public class TickerEventHandler implements EventHandler {
         });
         return res;
     }
+
+    public void putTicker(JsonNode json) {
+        logger.info("ticker.toString()");
+    }
+
 }

@@ -1,5 +1,6 @@
 package nbys.stonks;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
@@ -11,11 +12,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import nbys.stonks.cds.TickerHandler;
+
 @Component
 public class DataFetcher {
     private static final Logger logger = LoggerFactory.getLogger(DataFetcher.class);
 
     private final WebClient webClient = WebClient.create();
+
+    @Autowired
+    private TickerHandler tickerHandler;
 
     @Value("${stonks.data.api.url}")
     private String URL;
@@ -65,6 +71,8 @@ public class DataFetcher {
         JsonNode rootNode = objectMapper.readTree(json);
 
         String symbol = rootNode.get("Meta Data").get("2. Symbol").asText();
+
+        tickerHandler.putTicker(rootNode);
 
         return symbol;
     }
