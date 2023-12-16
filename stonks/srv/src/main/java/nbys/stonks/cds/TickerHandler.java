@@ -33,13 +33,16 @@ public class TickerHandler implements EventHandler {
     public Result onReadTicker(
             CdsReadEventContext req) {
         logger.info(req.getEvent() + req.getTarget().toString());
-        // logger.info(req.getResult().toString());
         logger.info(req.getCqn().toString());
 
         Result res = db.run(req.getCqn());
+        if (res == null) {
+            logger.info("No results");
+            return res;
+        }
 
         res.forEach(row -> {
-            logger.info(row.toString());
+            // logger.info(row.toString());
             row.put("name", String.format("%s - %S", row.get("name"), row.get("symbol")));
         });
         return res;

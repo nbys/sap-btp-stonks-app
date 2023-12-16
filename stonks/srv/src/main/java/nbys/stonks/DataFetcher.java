@@ -34,7 +34,7 @@ public class DataFetcher {
                 "        \"3. Last Refreshed\": \"2023-12-08 19:50:00\",\n" +
                 "        \"4. Interval\": \"5min\",\n" +
                 "        \"5. Output Size\": \"Full size\",\n" +
-                "        \"6. Time Zone\": \"US/Eastern\"\n" +
+                "        \"6. Time Zone\": \"US/Easter\"\n" +
                 "    },\n" +
                 "    \"Time Series (5min)\": {\n" +
                 "        \"2023-12-08 19:50:00\": {\n" +
