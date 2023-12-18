@@ -3,6 +3,10 @@ package nbys.stonks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -11,11 +15,24 @@ import reactor.core.publisher.Mono;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
+import cds.gen.nbys.stonks.Ticker;
 import nbys.stonks.cds.TickerHandler;
+import nbys.stonks.json.IntraDayJSON;
+import nbys.stonks.json.IntraDayMetaJSON;
+
+import com.sap.cds.Struct;
+import cds.gen.nbys.stonks.IntraDay;
+import java.util.List;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 @Component
 public class DataFetcher {
+    String METADATA_KEY = "Meta Data";
+
     private static final Logger logger = LoggerFactory.getLogger(DataFetcher.class);
 
     private final WebClient webClient = WebClient.create();
@@ -67,21 +84,44 @@ public class DataFetcher {
                 "        }\n" +
                 "    }\n" +
                 "}";
+
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode rootNode = objectMapper.readTree(json);
 
-        String symbol = rootNode.get("Meta Data").get("2. Symbol").asText();
+        List<IntraDay> intraDayList = new ArrayList<>();
+
+        Iterator<Map.Entry<String, JsonNode>> fieldsIterator = rootNode.fields();
+        IntraDayMetaJSON meta;
+        while (fieldsIterator.hasNext()) {
+            Map.Entry<String, JsonNode> field = fieldsIterator.next();
+            String key = field.getKey();
+            JsonNode value = field.getValue();
+            if (key.equals(METADATA_KEY)) {
+                meta = objectMapper.treeToValue(value, IntraDayMetaJSON.class);
+                continue;
+            }
+            Iterator<Map.Entry<String, JsonNode>> timeSeriesIterator = value.fields();
+            while (timeSeriesIterator.hasNext()) {
+                Map.Entry<String, JsonNode> timeSeries = timeSeriesIterator.next();
+                String time = timeSeries.getKey();
+                JsonNode timeSeriesValue = timeSeries.getValue();
+                IntraDayJSON intraDayJSON = objectMapper.treeToValue(timeSeriesValue, IntraDayJSON.class);
+                intraDayJSON.time = Instant.parse(time);
+                intraDayList.add(intraDayJSON.toCDS());
+            }
+        }
 
         tickerHandler.putTicker(rootNode);
 
-        return symbol;
+        return "ste";
+
     }
 
-    public Mono<String> fetchIntraDayData(String symbol) {
+    public String fetchIntraDayData(String symbol) {
         return webClient.get()
                 .uri(URL)
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToMono(String.class).block();
     }
 
     public void startFetchingData() {

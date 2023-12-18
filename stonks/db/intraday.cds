@@ -2,7 +2,7 @@ namespace nbys.stonks;
 
 using {cuid} from '@sap/cds/common';
 
-entity Ticker : cuid {
+entity Ticker {
     key symbol   : String;
         name     : localized String;
         sector   : localized String;
