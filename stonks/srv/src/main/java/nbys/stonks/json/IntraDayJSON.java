@@ -7,6 +7,7 @@ import java.time.Instant;
 
 import java.util.HashMap;
 
+import cds.gen.myservice.Ticker;
 import cds.gen.nbys.stonks.IntraDay;
 
 public class IntraDayJSON {
@@ -27,18 +28,26 @@ public class IntraDayJSON {
 
     public Instant time;
 
-    public IntraDay toCDS() {
+    public String ticker_symbol;
+
+    public IntraDay toCDS()
+            throws IllegalAccessException, NoSuchFieldException {
         HashMap<String, Object> map = new HashMap<>();
-        Field[] fields = IntraDay.class.getDeclaredFields();
+        Field[] fields = IntraDayJSON.class.getDeclaredFields();
 
         for (Field field : fields) {
             String name = field.getName();
-            if (name.equals("ID")) {
+            if (name == "ticker") {
                 continue;
             }
-            map.put(name, null);
+            map.put(name, this.getClass()
+                    .getDeclaredField(name.toLowerCase()).get(this));
         }
         IntraDay intraDay = access(map).as(IntraDay.class);
+        Ticker t = Ticker.create();
+
+        t.setSymbol(this.ticker_symbol);
+        intraDay.setTicker(t);
         return intraDay;
     }
 }

@@ -16,6 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import cds.gen.myservice.MyService_;
 import cds.gen.myservice.Ticker_;
+import cds.gen.nbys.stonks.IntraDay;
+import cds.gen.nbys.stonks.IntraDay_;
+import com.sap.cds.ql.Insert;
 
 @Component
 @ServiceName(MyService_.CDS_NAME)
@@ -50,6 +53,10 @@ public class TickerHandler implements EventHandler {
 
     public void putTicker(JsonNode json) {
         logger.info("ticker.toString()");
+    }
+
+    public void insertIntraDay(IntraDay intraDay) {
+        this.db.run(Insert.into(IntraDay_.class).entry(intraDay));
     }
 
 }

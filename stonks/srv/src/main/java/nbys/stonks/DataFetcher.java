@@ -3,31 +3,25 @@ package nbys.stonks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-
-import cds.gen.nbys.stonks.Ticker;
 import nbys.stonks.cds.TickerHandler;
 import nbys.stonks.json.IntraDayJSON;
 import nbys.stonks.json.IntraDayMetaJSON;
-
-import com.sap.cds.Struct;
 import cds.gen.nbys.stonks.IntraDay;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Component
 public class DataFetcher {
@@ -43,7 +37,7 @@ public class DataFetcher {
     @Value("${stonks.data.api.url}")
     private String URL;
 
-    public String unmarshalJSON() throws JsonProcessingException {
+    public String unmarshalJSON() throws JsonProcessingException, IllegalAccessException, NoSuchFieldException {
         String json = "{\n" +
                 "    \"Meta Data\": {\n" +
                 "        \"1. Information\": \"Intraday (5min) open, high, low, close prices and volume\",\n" +
@@ -51,7 +45,7 @@ public class DataFetcher {
                 "        \"3. Last Refreshed\": \"2023-12-08 19:50:00\",\n" +
                 "        \"4. Interval\": \"5min\",\n" +
                 "        \"5. Output Size\": \"Full size\",\n" +
-                "        \"6. Time Zone\": \"US/Easter\"\n" +
+                "        \"6. Time Zone\": \"US/Eastern\"\n" +
                 "    },\n" +
                 "    \"Time Series (5min)\": {\n" +
                 "        \"2023-12-08 19:50:00\": {\n" +
@@ -91,13 +85,14 @@ public class DataFetcher {
         List<IntraDay> intraDayList = new ArrayList<>();
 
         Iterator<Map.Entry<String, JsonNode>> fieldsIterator = rootNode.fields();
-        IntraDayMetaJSON meta;
+
+        IntraDayMetaJSON meta = objectMapper.treeToValue(rootNode.get(METADATA_KEY), IntraDayMetaJSON.class);
+
         while (fieldsIterator.hasNext()) {
             Map.Entry<String, JsonNode> field = fieldsIterator.next();
             String key = field.getKey();
             JsonNode value = field.getValue();
             if (key.equals(METADATA_KEY)) {
-                meta = objectMapper.treeToValue(value, IntraDayMetaJSON.class);
                 continue;
             }
             Iterator<Map.Entry<String, JsonNode>> timeSeriesIterator = value.fields();
@@ -106,12 +101,20 @@ public class DataFetcher {
                 String time = timeSeries.getKey();
                 JsonNode timeSeriesValue = timeSeries.getValue();
                 IntraDayJSON intraDayJSON = objectMapper.treeToValue(timeSeriesValue, IntraDayJSON.class);
-                intraDayJSON.time = Instant.parse(time);
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDateTime localDateTime = LocalDateTime.parse(time, formatter);
+                ZonedDateTime utcTimeDate = localDateTime.atZone(ZoneId.of(meta.timeZone));
+                intraDayJSON.time = utcTimeDate.toInstant();
+                intraDayJSON.ticker_symbol = meta.symbol;
+
                 intraDayList.add(intraDayJSON.toCDS());
             }
         }
 
-        tickerHandler.putTicker(rootNode);
+        intraDayList.forEach(intraDay -> {
+            tickerHandler.insertIntraDay(intraDay);
+        });
 
         return "ste";
 
@@ -133,5 +136,12 @@ public class DataFetcher {
                 e.printStackTrace();
             }
         }
+        // try {
+        // logger.info(this.URL);
+        // unmarshalJSON();
+        // } catch (JsonProcessingException | IllegalAccessException |
+        // NoSuchFieldException e) {
+        // e.printStackTrace();
+        // }
     }
 }
