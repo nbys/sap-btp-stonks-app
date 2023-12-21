@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.Instant;
 
 @Component
 public class DataFetcher {
@@ -37,50 +37,11 @@ public class DataFetcher {
     @Value("${stonks.data.api.url}")
     private String URL;
 
-    public String unmarshalJSON() throws JsonProcessingException, IllegalAccessException, NoSuchFieldException {
-        String json = "{\n" +
-                "    \"Meta Data\": {\n" +
-                "        \"1. Information\": \"Intraday (5min) open, high, low, close prices and volume\",\n" +
-                "        \"2. Symbol\": \"IBM\",\n" +
-                "        \"3. Last Refreshed\": \"2023-12-08 19:50:00\",\n" +
-                "        \"4. Interval\": \"5min\",\n" +
-                "        \"5. Output Size\": \"Full size\",\n" +
-                "        \"6. Time Zone\": \"US/Eastern\"\n" +
-                "    },\n" +
-                "    \"Time Series (5min)\": {\n" +
-                "        \"2023-12-08 19:50:00\": {\n" +
-                "            \"1. open\": \"161.9700\",\n" +
-                "            \"2. high\": \"161.9700\",\n" +
-                "            \"3. low\": \"161.9700\",\n" +
-                "            \"4. close\": \"161.9700\",\n" +
-                "            \"5. volume\": \"20\"\n" +
-                "        },        \n" +
-                "        \"2023-11-17 04:30:00\": {\n" +
-                "            \"1. open\": \"153.1500\",\n" +
-                "            \"2. high\": \"153.1500\",\n" +
-                "            \"3. low\": \"153.1500\",\n" +
-                "            \"4. close\": \"153.1500\",\n" +
-                "            \"5. volume\": \"22\"\n" +
-                "        },\n" +
-                "        \"2023-11-17 04:10:00\": {\n" +
-                "            \"1. open\": \"153.2400\",\n" +
-                "            \"2. high\": \"153.2400\",\n" +
-                "            \"3. low\": \"153.2400\",\n" +
-                "            \"4. close\": \"153.2400\",\n" +
-                "            \"5. volume\": \"1\"\n" +
-                "        },\n" +
-                "        \"2023-11-17 04:05:00\": {\n" +
-                "            \"1. open\": \"153.2600\",\n" +
-                "            \"2. high\": \"153.2700\",\n" +
-                "            \"3. low\": \"153.2600\",\n" +
-                "            \"4. close\": \"153.2700\",\n" +
-                "            \"5. volume\": \"40\"\n" +
-                "        }\n" +
-                "    }\n" +
-                "}";
+    public List<IntraDay> unmarshalIntradayResponse(String jsonString)
+            throws JsonProcessingException, IllegalAccessException, NoSuchFieldException {
 
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode rootNode = objectMapper.readTree(json);
+        JsonNode rootNode = objectMapper.readTree(jsonString);
 
         List<IntraDay> intraDayList = new ArrayList<>();
 
@@ -103,21 +64,19 @@ public class DataFetcher {
                 IntraDayJSON intraDayJSON = objectMapper.treeToValue(timeSeriesValue, IntraDayJSON.class);
 
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                LocalDateTime localDateTime = LocalDateTime.parse(time, formatter);
-                ZonedDateTime utcTimeDate = localDateTime.atZone(ZoneId.of(meta.timeZone));
-                intraDayJSON.time = utcTimeDate.toInstant();
+                Instant utcTimeDate = LocalDateTime.parse(time, formatter).atZone(ZoneId.of(meta.timeZone)).toInstant();
+                intraDayJSON.time = utcTimeDate;
                 intraDayJSON.ticker_symbol = meta.symbol;
 
                 intraDayList.add(intraDayJSON.toCDS());
             }
         }
 
-        intraDayList.forEach(intraDay -> {
-            tickerHandler.insertIntraDay(intraDay);
-        });
+        // intraDayList.forEach(intraDay -> {
+        // tickerHandler.insertIntraDay(intraDay);
+        // });
 
-        return "ste";
-
+        return intraDayList;
     }
 
     public String fetchIntraDayData(String symbol) {
@@ -136,12 +95,5 @@ public class DataFetcher {
                 e.printStackTrace();
             }
         }
-        // try {
-        // logger.info(this.URL);
-        // unmarshalJSON();
-        // } catch (JsonProcessingException | IllegalAccessException |
-        // NoSuchFieldException e) {
-        // e.printStackTrace();
-        // }
     }
 }

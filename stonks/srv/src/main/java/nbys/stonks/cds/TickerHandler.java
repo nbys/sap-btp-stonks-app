@@ -51,12 +51,9 @@ public class TickerHandler implements EventHandler {
         return res;
     }
 
-    public void putTicker(JsonNode json) {
-        logger.info("ticker.toString()");
-    }
-
     public void insertIntraDay(IntraDay intraDay) {
-        this.db.run(Insert.into(IntraDay_.class).entry(intraDay));
+        Result res = this.db.run(Insert.into(IntraDay_.class).entry(intraDay));
+        logger.info(res.toString());
     }
 
 }
