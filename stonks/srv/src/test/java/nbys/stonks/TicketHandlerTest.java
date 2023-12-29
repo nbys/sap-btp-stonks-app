@@ -16,8 +16,8 @@ import com.sap.cds.ql.cqn.CqnSelect;
 import com.sap.cds.services.cds.CdsReadEventContext;
 import com.sap.cds.services.persistence.PersistenceService;
 import cds.gen.nbys.stonks.Ticker;
-import cds.gen.myservice.Ticker_;
-import nbys.stonks.cds.TickerHandler;
+import cds.gen.stonks.Ticker_;
+import nbys.stonks.cds.StonksHandler;
 
 import com.sap.cds.Result;
 import java.util.stream.Collectors;
@@ -29,11 +29,11 @@ import java.util.List;
 
 @SpringBootTest
 @EnableAutoConfiguration
-@ContextConfiguration(classes = TickerHandler.class)
+@ContextConfiguration(classes = StonksHandler.class)
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 public class TicketHandlerTest {
-    static final Logger logger = LoggerFactory.getLogger(TickerHandler.class);
+    static final Logger logger = LoggerFactory.getLogger(StonksHandler.class);
 
     @FunctionalInterface
     private interface TriFunction<T, U, V, R> {
@@ -60,7 +60,7 @@ public class TicketHandlerTest {
                         tickerFactory.apply("Amazon", "AMZN", "Technology") },
         }).collect(Collectors.toMap(data -> (String) data[0], data -> List.of(data[1], (Ticker) data[2])));
 
-        TickerHandler tickerHandler = new TickerHandler(db);
+        StonksHandler tickerHandler = new StonksHandler(db);
 
         for (Map.Entry<String, List<Object>> entry : tickers.entrySet()) {
             String testName = entry.getKey();

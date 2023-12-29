@@ -12,21 +12,23 @@ import com.sap.cds.services.persistence.PersistenceService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import cds.gen.myservice.MyService_;
-import cds.gen.myservice.Ticker_;
+import cds.gen.nbys.stonks.Stonks_;
+import cds.gen.stonks.Ticker_;
 import cds.gen.nbys.stonks.IntraDay;
 import cds.gen.nbys.stonks.IntraDay_;
 import com.sap.cds.ql.Insert;
+import com.sap.cds.ql.Select;
+import java.util.ArrayList;
 
 @Component
-@ServiceName(MyService_.CDS_NAME)
-public class TickerHandler implements EventHandler {
-    static final Logger logger = LoggerFactory.getLogger(TickerHandler.class);
+@ServiceName(Stonks_.CDS_NAME)
+public class StonksHandler implements EventHandler {
+    static final Logger logger = LoggerFactory.getLogger(StonksHandler.class);
 
     @Autowired
     private PersistenceService db;
 
-    public TickerHandler(PersistenceService db) {
+    public StonksHandler(PersistenceService db) {
         this.db = db;
     }
 
@@ -52,6 +54,15 @@ public class TickerHandler implements EventHandler {
     public void insertIntraDay(IntraDay intraDay) {
         Result res = this.db.run(Insert.into(IntraDay_.class).entry(intraDay));
         logger.info(res.toString());
+    }
+
+    public ArrayList<String> getTickers() {
+        ArrayList<String> tickers = new ArrayList<String>();
+        Result res = this.db.run(Select.from(Ticker_.class).columns(t -> t.symbol()));
+        res.forEach(row -> {
+            tickers.add(row.get("symbol").toString());
+        });
+        return tickers;
     }
 
 }

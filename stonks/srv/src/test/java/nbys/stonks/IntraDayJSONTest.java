@@ -10,12 +10,13 @@ import org.springframework.test.context.ContextConfiguration;
 import cds.gen.nbys.stonks.IntraDay;
 import java.util.List;
 
-import nbys.stonks.cds.TickerHandler;
+import nbys.stonks.cds.StonksHandler;
 import nbys.stonks.json.IntraDayJSON;
 
 @SpringBootTest
 @EnableAutoConfiguration
-@ContextConfiguration(classes = { DataFetcher.class, TickerHandler.class, IntraDayJSON.class })
+@ContextConfiguration(classes = { DataFetcher.class, StonksHandler.class, IntraDayJSON.class,
+        ApplicationProperties.class })
 @ActiveProfiles("test")
 public class IntraDayJSONTest {
     private static final Logger logger = LoggerFactory.getLogger(DataFetcher.class);

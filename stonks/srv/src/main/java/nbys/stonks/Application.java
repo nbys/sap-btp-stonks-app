@@ -21,7 +21,7 @@ public class Application implements ApplicationRunner {
 		// run fetcher as a separate thread
 		new Thread() {
 			public void run() {
-				dataFetcher.startFetchingData();
+				dataFetcher.startDataProcess();
 			}
 		}.start();
 	}

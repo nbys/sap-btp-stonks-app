@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import cds.gen.myservice.Ticker;
+import cds.gen.stonks.Ticker;
 import cds.gen.nbys.stonks.IntraDay;
 
 @SuppressWarnings("unused")
@@ -123,5 +123,4 @@ public class IntraDayJSON {
 
         return intraDayList;
     }
-
 }
