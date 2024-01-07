@@ -65,4 +65,13 @@ public class StonksHandler implements EventHandler {
         return tickers;
     }
 
+    public ArrayList<IntraDay> getIntraDays() {
+        ArrayList<IntraDay> intraDays = new ArrayList<IntraDay>();
+        Result res = this.db.run(Select.from(IntraDay_.class));
+        res.forEach(row -> {
+            intraDays.add(row.as(IntraDay.class));
+        });
+        return intraDays;
+    }
+
 }

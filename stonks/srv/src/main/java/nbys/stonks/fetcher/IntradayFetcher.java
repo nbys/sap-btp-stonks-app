@@ -9,8 +9,7 @@ import nbys.stonks.json.Unmarshaller;
 
 @Component
 public class IntradayFetcher extends CommonFetcher {
-    @Autowired
-    public IntradayFetcher(@Qualifier("IntraDayJSON") Unmarshaller unmarshaller,
+    public IntradayFetcher(@Autowired @Qualifier("IntraDayJSON") Unmarshaller unmarshaller,
             ApplicationProperties properties) {
         super();
         this.setUnmarshaller(unmarshaller);

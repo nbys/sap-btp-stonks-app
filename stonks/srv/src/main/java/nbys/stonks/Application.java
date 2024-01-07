@@ -25,9 +25,6 @@ public class Application implements ApplicationRunner {
 		SpringApplication.run(Application.class, args);
 	}
 
-	@Autowired
-	private DataFetcher dataFetcher;
-
 	@Override
 	public void run(ApplicationArguments args) {
 		// run fetcher as a separate thread
@@ -51,5 +48,4 @@ public class Application implements ApplicationRunner {
 			}
 		}.start();
 	}
-
 }
