@@ -21,11 +21,20 @@ public class ApplicationProperties {
     public static class Api {
 
         private IntraDay intraDay;
+        private Incomes incomes;
 
         @Getter
         @Setter
         @ConfigurationProperties(prefix = "stonks.api.intraday")
         public static class IntraDay {
+            private String url;
+            private String method;
+        }
+
+        @Getter
+        @Setter
+        @ConfigurationProperties(prefix = "stonks.api.incomes")
+        public static class Incomes {
             private String url;
             private String method;
         }

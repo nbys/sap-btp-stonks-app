@@ -9,6 +9,10 @@ cds:
 stonks:
   refresh-timeout: 800000
   api:
+    key: ${API_KEY}
     intraday:
       url: https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&adjusted=false&symbol=${ticker}&interval=5min&apikey=${apikey}&outputsize=full
+      method: GET
+    incomes:
+      url: https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol=${ticker}&apikey=${apikey}
       method: GET
