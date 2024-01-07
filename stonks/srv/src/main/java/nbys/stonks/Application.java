@@ -41,7 +41,7 @@ public class Application implements ApplicationRunner {
 						ArrayList<String> tickers = stonksHandler.getTickers();
 						for (String ticker : tickers) {
 							DataFetcherFactory.handlerCache.forEach((label, handler) -> {
-r								logger.info(String.format("Fetching data for %s", label));
+								logger.info(String.format("Fetching data for %s", label));
 								String JSONString = handler.fetchFromAPI(ticker);
 								try {
 									List<CdsData> data = handler.unmarhal(JSONString);
@@ -51,7 +51,7 @@ r								logger.info(String.format("Fetching data for %s", label));
 								}
 							});
 						}
-						Thread.sleep(properties.getRefreshTimeout());
+						Thread.sleep(properties.getRefreshTimeout() * 1000);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}

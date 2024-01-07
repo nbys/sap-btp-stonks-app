@@ -7,7 +7,7 @@ cds:
   datasource.auto-config.enabled: false
 ---
 stonks:
-  refresh-timeout: 800000
+  refresh-timeout: 3600
   api:
     key: demo
     intraday:
