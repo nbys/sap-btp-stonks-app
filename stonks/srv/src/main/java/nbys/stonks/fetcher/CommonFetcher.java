@@ -7,9 +7,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.sap.cds.CdsData;
+import com.sap.cds.Result;
 import com.sap.cds.ql.Insert;
 import com.sap.cds.services.persistence.PersistenceService;
 
+import cds.gen.nbys.stonks.IntraDay_;
 import nbys.stonks.json.Unmarshaller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +43,7 @@ public class CommonFetcher implements DataFetcher {
     }
 
     @Autowired
-    private PersistenceService db;
+    protected PersistenceService db;
 
     @Override
     public String fetchFromAPI(String ticker) {
@@ -62,7 +64,7 @@ public class CommonFetcher implements DataFetcher {
 
     @Override
     public void persist(List<CdsData> cdsList) {
-        this.db.run(Insert.into(cdsList.get(0).getClass().getName()).entries(cdsList));
+        throw new UnsupportedOperationException("Unimplemented method 'persist'");
     }
 
     @Override

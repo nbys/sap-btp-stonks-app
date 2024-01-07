@@ -13,10 +13,17 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import nbys.stonks.cds.StonksHandler;
 import nbys.stonks.fetcher.DataFetcher;
 import nbys.stonks.fetcher.DataFetcherFactory;
+import java.util.List;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.sap.cds.CdsData;
 
 @SpringBootApplication
 public class Application implements ApplicationRunner {
 	private static final Logger logger = LoggerFactory.getLogger(DataFetcher.class);
+
+	@Autowired
+	private ApplicationProperties properties;
 
 	@Autowired
 	private StonksHandler stonksHandler;
@@ -27,7 +34,6 @@ public class Application implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) {
-		// run fetcher as a separate thread
 		new Thread() {
 			public void run() {
 				while (true) {
@@ -35,12 +41,17 @@ public class Application implements ApplicationRunner {
 						ArrayList<String> tickers = stonksHandler.getTickers();
 						for (String ticker : tickers) {
 							DataFetcherFactory.handlerCache.forEach((label, handler) -> {
-								logger.info(String.format("Fetching data for %s", label));
+r								logger.info(String.format("Fetching data for %s", label));
 								String JSONString = handler.fetchFromAPI(ticker);
-								logger.info(JSONString);
+								try {
+									List<CdsData> data = handler.unmarhal(JSONString);
+									handler.persist(data);
+								} catch (JsonProcessingException e) {
+									logger.error(e.getMessage());
+								}
 							});
 						}
-						Thread.sleep(1000);
+						Thread.sleep(properties.getRefreshTimeout());
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}

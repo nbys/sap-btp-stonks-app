@@ -85,6 +85,10 @@ public class IntradayUnmarshaller extends CdsUnmarshaller {
                 new TypeReference<Map<String, IntradayUnmarshaller>>() {
                 });
 
+        if (timeSeries == null) {
+            throw new JsonMappingException(null, "Time series is null");
+        }
+
         List<CdsData> timeSeriesList = new ArrayList<>();
 
         timeSeries.forEach((time, v) -> {
